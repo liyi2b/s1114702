@@ -8,20 +8,29 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import com.example.s1114702.ui.theme.S1114702Theme
 
 class MainActivity : ComponentActivity() {
@@ -43,11 +52,37 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     val activity = (LocalContext.current as? Activity)
 
-    Box(Modifier.background(Color(0xff95fe95)).fillMaxSize()) {
+    val backgroundColors = listOf(
+        Color(0xff95fe95),
+        Color(0xfffdca0f),
+        Color(0xfffea4a4),
+        Color(0xffa5dfed)
+    )
+
+    val currentColorIndex = remember { mutableStateOf(0) }
+    val currentImage = remember { mutableStateOf(R.drawable.class_b) }
+
+    Box(
+        Modifier.background(backgroundColors[currentColorIndex.value]).fillMaxSize()
+        .pointerInput(Unit) {
+            detectHorizontalDragGestures { _, dragAmount ->
+                if (dragAmount > 0) {
+                    currentColorIndex.value = (currentColorIndex.value + 1) % backgroundColors.size
+                } else {
+
+                    currentColorIndex.value =
+                        (currentColorIndex.value - 1 + backgroundColors.size) % backgroundColors.size
+                }
+            }
+        }
+
+    ){
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
             Text(
@@ -75,7 +110,9 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             }
 
         }
-
     }
-
 }
+
+
+
+
